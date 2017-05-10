@@ -1,6 +1,6 @@
 #include "Connector.h"
 
-Connector::Connector () {
+/*Connector::Connector () {
     Lchild = NULL;
     Rchild = NULL;
 }
@@ -13,5 +13,5 @@ Connector::Connector (Base*Lchild, Base*Rchild) {
 Connector::~Connector () {
     delete Lchild;
     delete Rchild;
-}
+}*/
 

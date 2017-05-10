@@ -5,14 +5,13 @@ And::And () {
     Rchild = NULL;
 }
 
-And::And (Base* Lchild, Base* Rchild) {
+And::And (Base* Lchild) {
     this->Lchild = Lchild;
-    this->Rchild = Rchild;
 }
 
 And::~And () {
-    delete Lchild;
-    delete Rchild;
+    //delete Lchild;
+    //delete Rchild;
 }
 
 bool And::execute () {

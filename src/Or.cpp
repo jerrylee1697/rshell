@@ -5,14 +5,13 @@ Or::Or () {
     Rchild = NULL;
 }
 
-Or::Or (Base*Lchild, Base* Rchild) {
+Or::Or (Base*Lchild) {
     this->Lchild = Lchild;
-    this->Rchild = Rchild;
 }
 
 Or::~Or () {
-    delete Lchild;
-    delete Rchild;
+    // delete Lchild;
+    // delete Rchild;
 }
 
 bool Or::execute() {
