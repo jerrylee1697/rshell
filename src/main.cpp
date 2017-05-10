@@ -14,7 +14,7 @@ using namespace std;
 using namespace std;
 using namespace boost;
 
-void Tokenize (const string& str, vector<string>& vec) {
+void Tokenize (const string& str, vector<string>& vec) { //splits string into tokens
     typedef tokenizer<char_separator<char> > Tok;
     char_separator<char> sep; // default constructed
     Tok tok(str, sep);
@@ -26,7 +26,7 @@ void Tokenize (const string& str, vector<string>& vec) {
 
 }
 
-void commentCheck(vector<string>& tok) {
+void commentCheck(vector<string>& tok) { //if a # is detected, remove all following tokens
     for(unsigned int i = 0; i < tok.size(); ++i) {
         if(tok.at(i) == "#") {
             tok.erase(tok.begin() + i, tok.end());
@@ -40,8 +40,8 @@ Base* createTree(vector<string> tok) {
     vector<string> arguments;
     Base* rt = NULL;
     
-    bool found = false;
-    for(i = 0; i < tok.size(); ++i) {
+    bool found = false; 
+    for(i = 0; i < tok.size(); ++i) { //checking to see if there are any connectors
         if(tok.at(i) == ";" || tok.at(i) == "|" || tok.at(i) == "&") {
             found = true;
         }
