@@ -5,7 +5,7 @@ And::And () {
     Rchild = NULL;
 }
 
-And::And (Base* Lchild) {
+And::And (Cmd* Lchild) {
     this->Lchild = Lchild;
 }
 
@@ -14,9 +14,9 @@ And::~And () {
     //delete Rchild;
 }
 
-bool And::execute () {
-    if (this->Lchild->execute()) {
-        return this->Rchild->execute();
+bool And::execute (bool done) {
+    if (done == true) {
+        return false;
     }
-    return false;
+    return true;
 }

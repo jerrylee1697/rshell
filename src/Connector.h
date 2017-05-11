@@ -8,7 +8,7 @@ class Connector : public Base {
         Connector () {};
         //Connector (Base*, Base*);
         ~Connector () {};
-        virtual bool execute () = 0;
+        virtual bool execute (bool) = 0;
         virtual string getExecutable () = 0;
 };
 

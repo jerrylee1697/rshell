@@ -15,13 +15,24 @@ using namespace std;
 using namespace boost;
 
 void Tokenize (const string& str, vector<string>& vec) { //splits string into tokens
-    typedef tokenizer<char_separator<char> > Tok;
-    char_separator<char> sep; // default constructed
-    Tok tok(str, sep);
+    typedef tokenizer<char_separator<char> > tokenizer;
+    char_separator<char> sep(";&|", ";&|", boost::keep_empty_tokens);
+    tokenizer tok(str, sep);
     
-    for(Tok::iterator tok_iter = tok.begin(); tok_iter != tok.end(); ++tok_iter) {
+    for(tokenizer::iterator tok_iter = tok.begin(); tok_iter != tok.end(); ++tok_iter) {
         vec.push_back(*tok_iter);
-        if(*tok_iter == "&" || *tok_iter == "|") {tok_iter++;}
+        if(*tok_iter == "&" || *tok_iter == "|") {tok_iter++; tok_iter++;}
+    }
+
+}
+void _Tokenize (const string& str, vector<string>& vec) { //splits string into tokens
+    typedef tokenizer<char_separator<char> > tokenizer;
+    char_separator<char> sep(" ");
+    tokenizer tok(str, sep);
+    
+    for(tokenizer::iterator tok_iter = tok.begin(); tok_iter != tok.end(); ++tok_iter) {
+        vec.push_back(*tok_iter);
+        //if(*tok_iter == "&" || *tok_iter == "|") {tok_iter++;}
     }
 
 }
@@ -34,7 +45,7 @@ void commentCheck(vector<string>& tok) { //if a # is detected, remove all follow
     }
 }
 
-Base* createTree(vector<string> tok) {
+/*Base* createTree(vector<string> tok) {
     unsigned int i;
     string executable;
     vector<string> arguments;
@@ -59,7 +70,7 @@ Base* createTree(vector<string> tok) {
     
     return rt;
 }
-/*
+
 Base* createTree(vector<string> tok) {
     unsigned int i = 0;
     string executable;
@@ -111,6 +122,51 @@ Base* createTree(vector<string> tok) {
     return tree;
 }*/
 
+bool Execute(vector<string> input) {
+    vector<string> arguments;
+    string executable;
+    Cmd* command;
+    Connector* connect;
+    bool done = false;
+    bool skip = false;
+    int i = 0;
+    
+    while(input.size() != 0) {
+        if(input.size() == 1) { //base case: no connectors
+            arguments.clear();
+            _Tokenize(input.at(i), arguments);
+            executable = arguments.front();
+            arguments.erase(arguments.begin());
+            //cout << executable << ", " << arguments.at(0) << endl;
+            command = new Cmd(executable, arguments);
+            return command->execute(done);
+        }
+        arguments.clear();
+        _Tokenize(input.at(i), arguments);
+        executable = arguments.front();
+        arguments.erase(arguments.begin());
+        command = new Cmd(executable, arguments);
+        input.erase(input.begin());
+        
+        if(input.at(i) == ";") {
+            connect = new Semi(command);
+        }
+        else if(input.at(i) == "&") {
+            connect = new And(command);
+        }
+        else if(input.at(i) == "|") {
+            connect = new Or(command);
+        }
+        input.erase(input.begin());
+        done = command->execute(done);
+        skip = connect->execute(done);
+        if(skip == true) {
+            input.erase(input.begin());
+        }
+    }
+    return 0;
+}
+
 int main() {
    while(1) {
         string executable = "";
@@ -121,9 +177,7 @@ int main() {
         
         Tokenize(executable, tok);
         commentCheck(tok);
-        Base* tree;
-        tree = createTree(tok);
-        tree->execute();
+        Execute(tok);
    }
 }
 

@@ -5,7 +5,7 @@ Semi::Semi () {
     Rchild = NULL;
 }
 
-Semi::Semi (Base* Lchild) {
+Semi::Semi (Cmd* Lchild) {
     this->Lchild = Lchild;
 }
 
@@ -14,7 +14,7 @@ Semi::~Semi () {
     // delete Rchild;
 }
 
-bool Semi::execute () {
-     this->Lchild->execute();
-    return this->Rchild->execute();
+bool Semi::execute (bool done) {
+    //this->Lchild->execute();
+    return false;//this->Rchild->execute();
 }

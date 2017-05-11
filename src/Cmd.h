@@ -15,7 +15,7 @@ class Cmd : public Base {
         Cmd (const string&);
         Cmd (const string&, const vector<string>&);
         ~Cmd ();
-        bool execute ();
+        bool execute (bool);
         string getExecutable ();
 };
 

@@ -6,12 +6,14 @@ using namespace std;
 #include "Connector.h"
 #include "Base.h"
 
+class Cmd;
+
 class And : public Connector {
     public:
         And ();
-        And (Base*);
+        And (Cmd*);
         ~And ();
-        bool execute ();
+        bool execute (bool);
         string getExecutable () {
             return "";
             

@@ -6,12 +6,14 @@
 #include <string>
 using namespace std;
 
+class Cmd;
+
 class Semi : public Connector {
     public:
         Semi ();
-        Semi (Base*);
+        Semi (Cmd*);
         ~Semi ();
-        bool execute ();
+        bool execute (bool);
         string getExecutable () {
             return "";
         };

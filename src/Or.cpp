@@ -5,7 +5,7 @@ Or::Or () {
     Rchild = NULL;
 }
 
-Or::Or (Base*Lchild) {
+Or::Or (Cmd* Lchild) {
     this->Lchild = Lchild;
 }
 
@@ -14,9 +14,10 @@ Or::~Or () {
     // delete Rchild;
 }
 
-bool Or::execute() {
-    if (!this->Lchild->execute()) {
-        return this->Rchild->execute();
-    }
-    return this->Lchild;
+bool Or::execute(bool done) {
+    // if (done == false) {
+    //     return false;
+    // }
+    // return true;
+    return done;
 }

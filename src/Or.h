@@ -6,12 +6,14 @@ using namespace std;
 #include "Connector.h"
 #include "Base.h"
 
+class Cmd;
+
 class Or : public Connector {
     public:
         Or ();
-        Or (Base*);
+        Or (Cmd*);
         ~Or ();
-        bool execute();
+        bool execute(bool);
         string getExecutable () {
             return "";
         };

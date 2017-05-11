@@ -31,7 +31,7 @@ Cmd::Cmd (const string& executable, const vector<string>& arguments) {
 
 //Cmd::~Cmd { }
 
-bool Cmd::execute() {
+bool Cmd::execute (bool done) {
     if (this->executable == "exit") {
         exit(0);
     }
