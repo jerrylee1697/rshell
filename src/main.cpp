@@ -16,7 +16,7 @@ using namespace boost;
 
 void Tokenize (const string& str, vector<string>& vec) { //splits string into tokens
     typedef tokenizer<char_separator<char> > tokenizer;
-    char_separator<char> sep(";&|", ";&|", boost::keep_empty_tokens);
+    char_separator<char> sep(";&|#", ";&|#", boost::keep_empty_tokens);
     tokenizer tok(str, sep);
     
     for(tokenizer::iterator tok_iter = tok.begin(); tok_iter != tok.end(); ++tok_iter) {
@@ -135,6 +135,8 @@ bool Execute(vector<string> input) {
         if(input.size() == 1) { //base case: no connectors
             arguments.clear();
             _Tokenize(input.at(i), arguments);
+            //commentCheck(arguments);
+            //if(arguments.size() == 0) {return true;}
             executable = arguments.front();
             arguments.erase(arguments.begin());
             //cout << executable << ", " << arguments.at(0) << endl;
@@ -168,9 +170,10 @@ bool Execute(vector<string> input) {
 }
 
 int main() {
-   while(1) {
-        string executable = "";
+    string executable = "";
         vector<string> tok;
+   while(1) {
+        tok.clear();
         
         cout << "$ ";
         getline(cin, executable);

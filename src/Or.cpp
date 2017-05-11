@@ -15,9 +15,9 @@ Or::~Or () {
 }
 
 bool Or::execute(bool done) {
-    // if (done == false) {
-    //     return false;
-    // }
-    // return true;
+     if (done == false) {
+         return false;
+     }
+     return true;
     return done;
 }
