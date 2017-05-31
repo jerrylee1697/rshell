@@ -3,6 +3,8 @@
 #include <cstring>
 using namespace std;
 
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <boost/tokenizer.hpp>
 
@@ -16,7 +18,7 @@ using namespace boost;
 
 void Tokenize (const string& str, vector<string>& vec) { //splits string into tokens
     typedef tokenizer<char_separator<char> > tokenizer;
-    char_separator<char> sep(";&|#", ";&|#", boost::keep_empty_tokens);
+    char_separator<char> sep(";&|#()", ";&|#()", boost::keep_empty_tokens);
     tokenizer tok(str, sep);
     
     for(tokenizer::iterator tok_iter = tok.begin(); tok_iter != tok.end(); ++tok_iter) {
@@ -38,89 +40,18 @@ void _Tokenize (const string& str, vector<string>& vec) { //splits string into t
 }
 
 void commentCheck(vector<string>& tok) { //if a # is detected, remove all following tokens
-    for(unsigned int i = 0; i < tok.size(); ++i) {
-        if(tok.at(i) == "#") {
-            tok.erase(tok.begin() + i, tok.end());
-        }
+    if(tok.size() >= 2) {
+        if (tok.at(1) == "#") {tok.clear();}
     }
-}
-
-/*Base* createTree(vector<string> tok) {
-    unsigned int i;
-    string executable;
-    vector<string> arguments;
-    Base* rt = NULL;
-    
-    bool found = false; 
-    for(i = 0; i < tok.size(); ++i) { //checking to see if there are any connectors
-        if(tok.at(i) == ";" || tok.at(i) == "|" || tok.at(i) == "&") {
-            found = true;
-        }
-    }
-    if(found == false) { //Base case: no connectors
-        i = 0;
-        executable = tok.at(i);
-        ++i;
-        for(;i < tok.size(); ++i) {
-            arguments.push_back(tok.at(i));
-        }
-        Base* rt = new Cmd(executable, arguments);
-        return rt;
-    }
-    
-    return rt;
-}
-
-Base* createTree(vector<string> tok) {
-    unsigned int i = 0;
-    string executable;
-    vector<string> arguments;
-    Base* tree = NULL;
-    Base* prev;
-    // Base* rt;
-    
-    //while(i < tok.size()) {
-        executable = tok.at(i);
-        ++i;
-        while(i <= tok.size() && (tok.at(i) != ";" || tok.at(i) != "|" || tok.at(i) != "&")) {
-            arguments.push_back(tok.at(i));
-            ++i;
-        } 
-        tree = new Cmd(executable, arguments); 
-        // rt = tree;
-        prev = tree;
-    while(i < tok.size()) {
-        if(i != tok.size()) {
-            if(tok.at(i) == ";") {
-                tree = new Semi(tree);
-                //prev->setRightChild(tree);
-                prev = tree;
-                ++i;
-            } 
-            else if (tok.at(i) == "|") {
-                tree = new Or(prev);
-                //prev->setRightChild(tree);
-                prev = tree;
-                ++i;
+    //else {
+        for(unsigned int i = 0; i < tok.size(); ++i) {
+            if(tok.at(i) == "#") {
+                tok.erase(tok.begin() + i, tok.end());
             }
-            else if (tok.at(i) == "&") {
-                tree = new And(prev);
-                //prev->setRightChild(tree);
-                prev = tree;
-                ++i;
-            }
-        } 
-        executable = tok.at(i);
-        ++i;
-        while(i <= tok.size() && (tok.at(i) != ";" || tok.at(i) != "|" || tok.at(i) != "&")) {
-            arguments.push_back(tok.at(i));
-            ++i;
-        } 
-        tree = new Cmd(executable, arguments); 
-        prev->setRightChild(tree);
-    }
-    return tree;
-}*/
+        }
+    //}
+    
+}
 
 bool Execute(vector<string> input) {
     vector<string> arguments;
@@ -132,6 +63,7 @@ bool Execute(vector<string> input) {
     int i = 0;
     
     while(input.size() != 0) {
+        
         if(input.size() == 1) { //base case: no connectors
             arguments.clear();
             _Tokenize(input.at(i), arguments);
@@ -148,6 +80,7 @@ bool Execute(vector<string> input) {
         executable = arguments.front();
         arguments.erase(arguments.begin());
         command = new Cmd(executable, arguments);
+        
         input.erase(input.begin());
         
         if(input.at(i) == ";") {
@@ -160,10 +93,23 @@ bool Execute(vector<string> input) {
             connect = new Or(command);
         }
         input.erase(input.begin());
+        
         done = command->execute(done);
         skip = connect->execute(done);
-        if(skip == true) {
+        
+        if(skip == true) { //check if the first OR condition executed
             input.erase(input.begin());
+            while(input.size() != 0) {
+                if(input.at(0) == "|") {
+                    input.erase(input.begin());
+                    input.erase(input.begin());
+                }
+                if(input.size() == 0) {break;}
+                if(input.at(0) == "&") {
+                    input.erase(input.begin());
+                    break;
+                }
+            }
         }
     }
     return 0;

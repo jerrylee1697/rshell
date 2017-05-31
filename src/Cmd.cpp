@@ -1,4 +1,5 @@
 #include "Cmd.h"
+#include "Test.h"
 #include <cstdio>
 #include <cstdlib>
 #include <stdlib.h>
@@ -34,6 +35,16 @@ Cmd::Cmd (const string& executable, const vector<string>& arguments) {
 bool Cmd::execute (bool done) {
     if (this->executable == "exit") {
         exit(0);
+    }
+    
+    if (this->executable == "test") {
+        Base* testCommand = new Test(argumentList);
+        return testCommand->execute(done);
+    }
+    if (this->executable == "[" && argumentList.at(argumentList.size() - 1) == "]") {
+        argumentList.pop_back();
+        Base* testCommand = new Test(argumentList);
+        return testCommand->execute(done);
     }
     
     char* args[100];

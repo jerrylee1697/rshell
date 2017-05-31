@@ -1,0 +1,76 @@
+/*Base* createTree(vector<string> tok) {
+    unsigned int i;
+    string executable;
+    vector<string> arguments;
+    Base* rt = NULL;
+    
+    bool found = false; 
+    for(i = 0; i < tok.size(); ++i) { //checking to see if there are any connectors
+        if(tok.at(i) == ";" || tok.at(i) == "|" || tok.at(i) == "&") {
+            found = true;
+        }
+    }
+    if(found == false) { //Base case: no connectors
+        i = 0;
+        executable = tok.at(i);
+        ++i;
+        for(;i < tok.size(); ++i) {
+            arguments.push_back(tok.at(i));
+        }
+        Base* rt = new Cmd(executable, arguments);
+        return rt;
+    }
+    
+    return rt;
+}
+
+Base* createTree(vector<string> tok) {
+    unsigned int i = 0;
+    string executable;
+    vector<string> arguments;
+    Base* tree = NULL;
+    Base* prev;
+    // Base* rt;
+    
+    //while(i < tok.size()) {
+        executable = tok.at(i);
+        ++i;
+        while(i <= tok.size() && (tok.at(i) != ";" || tok.at(i) != "|" || tok.at(i) != "&")) {
+            arguments.push_back(tok.at(i));
+            ++i;
+        } 
+        tree = new Cmd(executable, arguments); 
+        // rt = tree;
+        prev = tree;
+    while(i < tok.size()) {
+        if(i != tok.size()) {
+            if(tok.at(i) == ";") {
+                tree = new Semi(tree);
+                //prev->setRightChild(tree);
+                prev = tree;
+                ++i;
+            } 
+            else if (tok.at(i) == "|") {
+                tree = new Or(prev);
+                //prev->setRightChild(tree);
+                prev = tree;
+                ++i;
+            }
+            else if (tok.at(i) == "&") {
+                tree = new And(prev);
+                //prev->setRightChild(tree);
+                prev = tree;
+                ++i;
+            }
+        } 
+        executable = tok.at(i);
+        ++i;
+        while(i <= tok.size() && (tok.at(i) != ";" || tok.at(i) != "|" || tok.at(i) != "&")) {
+            arguments.push_back(tok.at(i));
+            ++i;
+        } 
+        tree = new Cmd(executable, arguments); 
+        prev->setRightChild(tree);
+    }
+    return tree;
+}*/
