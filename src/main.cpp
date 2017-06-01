@@ -46,14 +46,11 @@ void commentCheck(vector<string>& tok) { //if a # is detected, remove all follow
     if(tok.size() >= 2) {
         if (tok.at(1) == "#") {tok.clear();}
     }
-    //else {
-        for(unsigned int i = 0; i < tok.size(); ++i) {
-            if(tok.at(i) == "#") {
-                tok.erase(tok.begin() + i, tok.end());
-            }
+    for(unsigned int i = 0; i < tok.size(); ++i) {
+        if(tok.at(i) == "#") {
+            tok.erase(tok.begin() + i, tok.end());
         }
-    //}
-    
+    }
 }
 
 bool Execute(vector<string> input) {
@@ -124,82 +121,116 @@ bool ParenthExecute(vector<string>& input, bool in) {
     string executable;
     Cmd* command;
     Connector* connect;
-    bool done = false;
+    bool done = false; 
     bool skip = false;
-    bool recursion = false;
-    bool rightClosed = false;
+    bool recursion = false; //used to track whether commands in parentheses succeeded
+    bool rightClosed = false; //check if the parentheses have closed
+    bool andVal = false;
     int i = 0;
     
     while(input.size() != 0) {
-        
-        if(input.size() == 1) { //base case: no connectors
+        //for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
+        if(input.size() == 1) { //BASE CASE: no connectors left
             arguments.clear();
             _Tokenize(input.at(i), arguments);
-            //commentCheck(arguments);
-            //if(arguments.size() == 0) {return true;}
             executable = arguments.front();
             arguments.erase(arguments.begin());
-            //cout << executable << ", " << arguments.at(0) << endl;
             command = new Cmd(executable, arguments);
             return command->execute(done);
         }
-       // for(unsigned int a = 0; a < input.size(); ++a) {cout << input.at(a) << ", "; } cout << endl;
         
         if(input.at(i) == "(") { //check for beginning parentheses, if found ENTER RECURSION
             input.erase(input.begin());
+            //for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
             recursion = ParenthExecute(input, recursion);
             rightClosed = true;
-            //for(unsigned int a = 0; a < input.size(); ++a) {cout << input.at(a) << ", "; } cout << endl;
             if(input.size() == 0) {break;}
         }
         
-        if(input.at(i) == ")") {/*return false;*/ return recursion;}
         
-        if(input.at(i) != ";" && input.at(i) != "&" && input.at(i) != "|") {
-        arguments.clear();                    //parse first command
-        _Tokenize(input.at(i), arguments);
-        executable = arguments.front();
-        arguments.erase(arguments.begin());
-        command = new Cmd(executable, arguments);
-        input.erase(input.begin());
+        if(input.at(i) == ")") { //checks for empty parentheses
+            input.erase(input.begin()); 
+            //for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
+            return recursion;
         }
         
-        if(input.at(i) == ")") {return command->execute(done);} //check if there is a single command contained within parentheses
+        if(input.at(i) != ";" && input.at(i) != "&" && input.at(i) != "|") { //check if a new command must be parsed
+            arguments.clear();                    //parse first command
+            _Tokenize(input.at(i), arguments);
+            executable = arguments.front();
+            arguments.erase(arguments.begin());
+            command = new Cmd(executable, arguments);
+            input.erase(input.begin());
+            //for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
+        }
         
-        if(input.at(i) == ";") {
+        if(input.at(i) == ")") { //check if there is a single command left within parentheses
+            input.erase(input.begin()); 
+            //for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
+            return command->execute(done);
+        } 
+        
+        if(input.at(i) == ";") { //check for appropriate connector
             connect = new Semi(command);
+            input.erase(input.begin());
+            andVal = true;
         }
         else if(input.at(i) == "&") {
             connect = new And(command);
+            input.erase(input.begin());
+            andVal = true;
         }
         else if(input.at(i) == "|") {
             connect = new Or(command);
+            input.erase(input.begin());
+        } //for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
+        
+        //if l-value is parentheses, set new command (r-value)
+        if(rightClosed == true) {
+            arguments.clear();                   
+            _Tokenize(input.at(i), arguments);
+            executable = arguments.front();
+            arguments.erase(arguments.begin());
+            command = new Cmd(executable, arguments);
+            input.erase(input.begin());
         }
-        input.erase(input.begin());
         
-        if(rightClosed != true) {done = command->execute(done); rightClosed = false;} //execute command and return success 
-        skip = connect->execute(done); //execute connector to determine if rightCmd needs to be executed
-        recursion = done;
+        if(recursion != true || andVal == true) {
+            andVal = false;
+            done = command->execute(done); //execute command and return success
+            recursion = done;
+            rightClosed = false;
+            skip = connect->execute(done);
+        }
         
-        if(skip == true) { //verify that first OR condition succeeded
+        else { //if l-value succeeded, no need to re-execute command, simply figure out if skipping commands is necessary
+            skip = connect->execute(recursion);
+        } //execute connector to determine if rightCmd needs to be executed
+        
+        if(skip == true && input.size() >= 1) { //verify that first OR condition succeeded
             input.erase(input.begin());
             while(input.size() != 0) {
-                if(input.at(0) == ")") {/*return done;*/ return recursion;}
+                if(input.at(0) == ")") {input.erase(input.begin()); return recursion;}
+                //for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl; return recursion;}
                 if(input.at(0) == "(") {
                     input.erase(input.begin());
                     input.erase(input.begin());
+                    //for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
                 }
                 if(input.at(0) == "|") {
                     input.erase(input.begin());
                     input.erase(input.begin());
+                    //for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
                 }
                 if(input.size() == 0) {break;}
                 if(input.at(0) == "&") {
                     input.erase(input.begin());
+                    //for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
                     break;
                 }
             }
         }
+        
     }
     return 0;
 }
