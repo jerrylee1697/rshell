@@ -14,10 +14,10 @@ Or::~Or () {
     // delete Rchild;
 }
 
-bool Or::execute(bool done) {
-    //  if (done == false) {
-    //      return false;
+bool Or::execute(bool skip) {
+    //  if (skip == false) {
+    //      return true;
     //  }
-    //  return true;
-    return done;
+    //  return false;
+    return skip;
 }

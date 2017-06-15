@@ -18,6 +18,7 @@ bool Test::execute(bool done) {
     // Checks if there are more than 2 arguments (invalid)
     if (arguments.size() > 2) {
         cout << "(False)\n";
+        // return false;
         return false;
     }
     
@@ -28,6 +29,7 @@ bool Test::execute(bool done) {
         if (stat(arguments.at(0).c_str(), &buf) == 0) {
             cout << "(True)\n";
             return true;
+            // return false;
         }    
     }
     // cout << arguments.at(0)
@@ -38,21 +40,25 @@ bool Test::execute(bool done) {
                 if (S_ISREG(buf.st_mode) == 0) {
                     cout << "(True)\n";
                     return true;
+                    // return false;
                 }
             }   
             if (arguments.at(0) == "-d") {
-                if (S_ISDIR(buf.st_mode) == 0) {
+                if (S_ISDIR(buf.st_mode) != 0) {
                     cout << "(True)\n";
                     return true;
+                    // return false;
                 }
             }
             if (arguments.at(0) == "-e") {
                 cout << "(True)\n";
                 return true;
+                // return false;
             }
         }
     }
     
     cout << "(False)\n";
     return false;
+    // return true;
 }

@@ -14,9 +14,14 @@ And::~And () {
     //delete Rchild;
 }
 
-bool And::execute (bool done) {
-    if (done == true) {
+bool And::execute (bool skip) {
+    if (skip == true) {
         return false;
     }
     return true;
+    
+    // if (done == false) {
+    //     return true;
+    // }
+    // return fa;
 }
