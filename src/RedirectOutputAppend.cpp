@@ -10,12 +10,13 @@ RedirectOutputAppend::~RedirectOutputAppend() {
     // delete Rchild;
 }
 
-RedirectOutputAppend::RedirectOutputAppend(Cmd* Lchild) {
+RedirectOutputAppend::RedirectOutputAppend(Cmd* Lchild, string filename) {
+    this->filename = filename;
     this->Lchild = Lchild;
 }
 
 bool RedirectOutputAppend::execute(bool done) {
-     string exec = Rchild->getExecutable();
+     string exec = filename;
      
      // 'w' = empty file & recreate
      // 'a' = append

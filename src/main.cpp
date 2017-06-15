@@ -27,7 +27,8 @@ void Tokenize (const string& str, vector<string>& vec) { //splits string into to
     
     for(tokenizer::iterator tok_iter = tok.begin(); tok_iter != tok.end(); ++tok_iter) {
         vec.push_back(*tok_iter);
-        if(*tok_iter == "&" || *tok_iter == "|" ) {tok_iter++; tok_iter++;}
+        if(*tok_iter == "&"/* || *tok_iter == "|"*/) {tok_iter++; tok_iter++;}
+        if(*tok_iter == "|") {tok_iter++;}
     }
     for(unsigned int a = 0; a < vec.size(); ++a) { //check for a delete empty spaces
         if(vec.at(a) == " " || vec.at(a) == "") {vec.erase(vec.begin() + a);}
@@ -64,11 +65,11 @@ bool Execute(vector<string> input) {
     Connector* connect;
     bool done = false;
     bool skip = false;
-   // bool redirect = false;
+    bool redirect = false;
     int i = 0;
     
     while(input.size() != 0) {
-        for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
+       // for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
         if(input.size() == 1) { //base case: no connectors
             arguments.clear();
             _Tokenize(input.at(i), arguments);
@@ -86,7 +87,7 @@ bool Execute(vector<string> input) {
         executable = arguments.front();
         arguments.erase(arguments.begin());
         command = new Cmd(executable, arguments);
-        for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
+        //for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
         
         input.erase(input.begin());
         
@@ -106,30 +107,37 @@ bool Execute(vector<string> input) {
             }
         }
         else if(input.at(i) == "<") {   // Input Redirect
-            connect = new RedirectInput(command);
-            RedirectOutput();
+            input.erase(input.begin());
+            connect = new RedirectInput(command, input.at(i));
+            input.erase(input.begin());
+           // RedirectOutput();
+            redirect = true;
         }
         else if(input.at(i) == ">") {
             if (input.at(i + 1) != ">") {
-                connect = new RedirectOutput(command, input.at(i + 1));
                 input.erase(input.begin());
-                //redirect = true;
+                connect = new RedirectOutput(command, input.at(i));
+                redirect = true;
             }
             else {
-                connect = new RedirectOutputAppend(command);
+                input.erase(input.begin());
+                input.erase(input.begin());
+                connect = new RedirectOutputAppend(command, input.at(i));
+                redirect = true;
             }
         }
         
         input.erase(input.begin());
-        for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
+        //for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
         
-        cout << "1" << endl;
-        /*if(redirect == true) {
+        if(redirect == true) {
             skip = connect->execute(done);
-            done = command->execute(done);
-        } */
+            //done = command->execute(done);
+            redirect = false;
+        } 
+        else {
         done = command->execute(done);
-        skip = connect->execute(done);
+        skip = connect->execute(done);}
     
         
         if(skip == true) { //check if the first OR condition executed
@@ -159,6 +167,7 @@ bool ParenthExecute(vector<string>& input, bool in) {
     bool skip = false;
     bool recursion = false; //used to track whether commands in parentheses succeeded
     bool rightClosed = false; //check if the parentheses have closed
+    bool redirect = false;
     //bool andVal = false;
     int i = 0;
     
@@ -217,6 +226,25 @@ bool ParenthExecute(vector<string>& input, bool in) {
             connect = new Or(command);
             input.erase(input.begin());
         } //for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
+        
+        else if(input.at(i) == "<") {   // Input Redirect
+            input.erase(input.begin());
+            connect = new RedirectInput(command, input.at(i));
+            input.erase(input.begin());
+            RedirectOutput();
+        }
+        else if(input.at(i) == ">") {
+            if (input.at(i + 1) != ">") {
+                input.erase(input.begin());
+                connect = new RedirectOutput(command, input.at(i));
+                redirect = true;
+            }
+            else {
+                input.erase(input.begin());
+                input.erase(input.begin());
+                connect = new RedirectOutputAppend(command, input.at(i));
+            }
+        }
         //if l-value is parentheses, set new command (r-value)
         if(rightClosed == true && input.at(i) != "(") {
             arguments.clear();                   
@@ -227,7 +255,13 @@ bool ParenthExecute(vector<string>& input, bool in) {
             input.erase(input.begin());
         }
         
-        if(recursion != true /*&& andVal == true*/) {
+        if(redirect == true) {
+            skip = connect->execute(done);
+            done = command->execute(done);
+            redirect = false;
+        }
+        
+        if(recursion != true && redirect != true/*&& andVal == true*/) {
             //andVal = false;
             done = command->execute(done); //execute command and return success
             recursion = done;

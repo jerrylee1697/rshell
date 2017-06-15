@@ -15,10 +15,11 @@
 // class Cmd;
 
 class RedirectInput : public Connector {
+        string filename;
     public:
         RedirectInput ();
         ~RedirectInput ();
-        RedirectInput (Cmd*);
+        RedirectInput (Cmd*, string);
         bool execute (bool);
         string getExecutable () {return "";}; 
 };

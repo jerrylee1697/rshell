@@ -11,7 +11,7 @@ Pipe::~Pipe() {
 }
 
 Pipe::Pipe(Cmd* left) {
-    this->Lchild = left;    
+    this->Lchild = left;
 }
 
 bool Pipe::execute (bool done) {

@@ -16,10 +16,11 @@
 // class Cmd;
 
 class RedirectOutputAppend : public Connector {
+        string filename;
     public:
         RedirectOutputAppend();
         ~RedirectOutputAppend();
-        RedirectOutputAppend(Cmd*);
+        RedirectOutputAppend(Cmd*, string);
         bool execute(bool);
         string getExecutable () {return "";};
 };

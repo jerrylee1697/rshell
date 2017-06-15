@@ -18,10 +18,14 @@ RedirectOutput::RedirectOutput(Cmd* Lchild, string filename) {
 bool RedirectOutput::execute(bool done) {
      string exec = filename;
      
-    //  cout << filename << " inside\n";
+     //cout << filename << " inside\n";
      // 'w' = empty file & recreate
      // 'a' = append
      FILE *test = fopen(exec.c_str(), "w");
+     
+     if (test == NULL) {
+         cout << "failed to open file\n";
+     }
      
      int fd = fileno(test); 
      
@@ -30,12 +34,8 @@ bool RedirectOutput::execute(bool done) {
      int pid;
      pid = fork();
      
-     cout << pid << endl;
-     
      if (pid == 0) {
-         cout << "3" << endl;
          dup2(fd,STDOUT_FILENO);
-         cout << "2" << endl;
          if (Lchild->execute(done)) {
              successful = true;
             //  cout <<"success";

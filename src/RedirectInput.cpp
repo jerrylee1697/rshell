@@ -10,12 +10,13 @@ RedirectInput::~RedirectInput () {
     // delete Rchild;
 }
 
-RedirectInput::RedirectInput (Cmd* left) {
-    this->Lchild = left;
+RedirectInput::RedirectInput (Cmd* Lchild, string filename) {
+    this->filename = filename;
+    this->Lchild = Lchild;
 }
 
 bool RedirectInput::execute (bool done) {
-    string exec = Rchild->getExecutable();
+    string exec = filename;
     // Establish connection between file and file descriptor
     int fd = open(exec.c_str(), O_RDONLY, 0);
     // O_RDONLY = Open for reading only
