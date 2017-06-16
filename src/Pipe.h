@@ -18,9 +18,10 @@ class Pipe : public Connector {
     public:
         Pipe();
         ~Pipe();
-        Pipe(Cmd*); 
+        Pipe(Cmd*, Cmd*); 
         bool execute(bool);
         string getExecutable() {return "";}; 
+        void setRight(Cmd*);
 };
 
 #endif

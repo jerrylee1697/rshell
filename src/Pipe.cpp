@@ -10,8 +10,9 @@ Pipe::~Pipe() {
     // delete Rchild;
 }
 
-Pipe::Pipe(Cmd* left) {
+Pipe::Pipe(Cmd* left, Cmd* right) {
     this->Lchild = left;
+    this->Rchild = right;
 }
 
 bool Pipe::execute (bool done) {

@@ -27,8 +27,8 @@ void Tokenize (const string& str, vector<string>& vec) { //splits string into to
     
     for(tokenizer::iterator tok_iter = tok.begin(); tok_iter != tok.end(); ++tok_iter) {
         vec.push_back(*tok_iter);
-        if(*tok_iter == "&"/* || *tok_iter == "|"*/) {tok_iter++; tok_iter++;}
-        if(*tok_iter == "|") {tok_iter++;}
+        if(*tok_iter == "&"/* || *tok_iter == "|"*/) {tok_iter++; /*tok_iter++;*/}
+        //if(*tok_iter == "|") {tok_iter++;}
     }
     for(unsigned int a = 0; a < vec.size(); ++a) { //check for a delete empty spaces
         if(vec.at(a) == " " || vec.at(a) == "") {vec.erase(vec.begin() + a);}
@@ -66,10 +66,11 @@ bool Execute(vector<string> input) {
     bool done = false;
     bool skip = false;
     bool redirect = false;
+    // bool pipe = false;
     int i = 0;
     
     while(input.size() != 0) {
-       // for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
+        // for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
         if(input.size() == 1) { //base case: no connectors
             arguments.clear();
             _Tokenize(input.at(i), arguments);
@@ -87,8 +88,9 @@ bool Execute(vector<string> input) {
         executable = arguments.front();
         arguments.erase(arguments.begin());
         command = new Cmd(executable, arguments);
-        //for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
         
+        // for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
+
         input.erase(input.begin());
         
         if(input.at(i) == ";") {
@@ -99,11 +101,19 @@ bool Execute(vector<string> input) {
         }
         else if(input.at(i) == "|") {
             if (input.at(i + 1) != "|") {   // Pipe if one "|"
-                connect = new Pipe(command);
+                arguments.clear();
+                Cmd* command2;
+                _Tokenize(input.at(i), arguments);
+                executable = arguments.front();
+                arguments.erase(arguments.begin());
+                command2 = new Cmd(executable, arguments);
+                connect = new Pipe(command, command2);
                 input.erase(input.begin());
+                // pipe = true;
             }
             else {                              // Or if two "|"
                 connect = new Or(command);
+                input.erase(input.begin());
             }
         }
         else if(input.at(i) == "<") {   // Input Redirect
@@ -123,12 +133,23 @@ bool Execute(vector<string> input) {
                 input.erase(input.begin());
                 input.erase(input.begin());
                 connect = new RedirectOutputAppend(command, input.at(i));
-                redirect = true;
+                // redirect = true;
             }
         }
         
         input.erase(input.begin());
-        //for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
+        
+        // for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
+        
+        // if(pipe == true) {
+        //     arguments.clear();
+        //     _Tokenize(input.at(i), arguments);
+        //     executable = arguments.front();
+        //     arguments.erase(arguments.begin());
+        //     command = new Cmd(executable, arguments);
+            
+        //     connect->setRight(command);
+        // }
         
         if(redirect == true) {
             skip = connect->execute(done);
@@ -222,9 +243,22 @@ bool ParenthExecute(vector<string>& input, bool in) {
             input.erase(input.begin());
             //andVal = true;
         }
-        else if(input.at(i) == "|") {
-            connect = new Or(command);
-            input.erase(input.begin());
+         else if(input.at(i) == "|") {
+            if (input.at(i + 1) != "|") {   // Pipe if one "|"
+                arguments.clear();
+                Cmd* command2;
+                _Tokenize(input.at(i), arguments);
+                executable = arguments.front();
+                arguments.erase(arguments.begin());
+                command2 = new Cmd(executable, arguments);
+                connect = new Pipe(command, command2);
+                input.erase(input.begin());
+                // pipe = true;
+            }
+            else {                              // Or if two "|"
+                connect = new Or(command);
+                input.erase(input.begin());
+            }
         } //for(unsigned int j = 0; j < input.size(); ++j) {cout << input.at(j) << ", ";} cout << endl;
         
         else if(input.at(i) == "<") {   // Input Redirect

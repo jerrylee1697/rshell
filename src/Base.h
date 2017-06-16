@@ -9,15 +9,15 @@ class Cmd;
 class Base {
     protected:
         Cmd* Lchild;
-        Base* Rchild;
+        Cmd* Rchild;
     public:
         Base () { };
         ~Base () { };
         virtual bool execute (bool) = 0;
         virtual string getExecutable () = 0;
-        void setRightChild(Base* tree) {
+        /*void setRightChild(Base* tree) {
             Rchild = tree;
-        }
+        }*/
 };
 
 #endif

@@ -10,6 +10,9 @@ class Connector : public Base {
         ~Connector () {};
         virtual bool execute (bool) = 0;
         virtual string getExecutable () = 0;
+        void setRight(Cmd* command) {
+            Rchild = command;
+        }
 };
 
 #endif
